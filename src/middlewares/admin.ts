@@ -6,7 +6,6 @@ import { errorReturn } from "../utils/utils";
 const adminMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const user = req.user;
-
         if (user?.role === 'USER') {
             next()
         } else {

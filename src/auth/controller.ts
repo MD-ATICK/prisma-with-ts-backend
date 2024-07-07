@@ -8,9 +8,7 @@ class UserController {
     register = async (req: Request, res: Response) => {
         try {
             const { password, email, name } = req.body;
-            console.log(req.body)
             let user = await prisma.user.findFirst({ where: { email } })
-            console.log({ user })
             if (user) return errorReturn(res, 'user already registered')
 
             user = await prisma.user.create({
@@ -29,7 +27,6 @@ class UserController {
 
     login = async (req: Request, res: Response) => {
         const { email, password } = req.body
-        console.log(email, password)
         let user = await prisma.user.findFirst({ where: { email } })
         if (!user) return errorReturn(res, "user not found")
 
