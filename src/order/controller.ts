@@ -15,7 +15,8 @@ class OrderController {
                     },
                     include: {
                         product: true
-                    }
+                    },
+
                 })
                 if (carts.length === 0) return errorReturn(res, 'cart is empty')
 

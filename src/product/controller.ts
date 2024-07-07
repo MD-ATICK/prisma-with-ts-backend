@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import NodeCache from "node-cache"
-import { prisma } from ".."
+import { prisma, redis } from ".."
 import { arrayToString, errorReturn, successReturn } from "../utils/utils"
 import { productSchema } from "../utils/zodValidation"
 const nodeCache = new NodeCache()
@@ -27,10 +27,20 @@ class ProductController {
             const key = 'products'
             let products;
             const search = 'atick'
-            if (nodeCache.has(key)) {
-                products = nodeCache.get(key) as any[]
+
+            // 🟢 data store method 1 - in redis
+            if (await redis.exists(key)) {
+                console.log('redis cached.')
+                products = JSON.parse(await redis.get(key) as any)
                 return successReturn(res, 200, products)
             }
+
+
+            // 🟢 data store method 1 - in node-cache
+            // if (nodeCache.has(key)) {
+            //     products = nodeCache.get(key) as any[]
+            //     return successReturn(res, 200, products)
+            // }
 
             const count = await prisma.product.count()
             const skip = parseInt(req.query.skip as string) || 0
@@ -43,7 +53,11 @@ class ProductController {
                 skip,
                 take: 5,
             })
-            nodeCache.set(key, { get: 'cache', skip, count, products })
+
+            // 🟢 method - 1 -> redis cache
+            await redis.set(key, JSON.stringify({ get: 'redis-cache', skip, count, products }))
+            // 🟢 method - 2 -> node-cache
+            // nodeCache.set(key, { get: 'node-cache', skip, count, products })
             successReturn(res, 200, { count: count, products: products })
 
         } catch (error) {

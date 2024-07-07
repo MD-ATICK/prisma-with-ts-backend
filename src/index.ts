@@ -6,8 +6,19 @@ import addressRoute from './address/route'
 import cartRoute from './cart/route'
 import orderRoute from './order/route'
 import adminRoute from './admin/route'
+import { Redis } from 'ioredis'
 const app: Express = express()
 const port: number = 9999
+export const redis: Redis = new Redis({
+    host: 'redis-18919.c9.us-east-1-4.ec2.redns.redis-cloud.com',
+    port: 18919,
+    password: '6IRJ0CBZpbd3OHy5KKuOVeyLgnk74rJk'
+})
+
+redis.on('connect', () => {
+    console.log('🔴 Connected to Redis.')
+})
+
 
 
 export const prisma = new PrismaClient().$extends({
@@ -44,6 +55,6 @@ app.use('/order', orderRoute)
 app.use('/admin', adminRoute)
 
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}.`)
+    console.log(`🟢 Server is running on port ${port}.`)
 })
 
